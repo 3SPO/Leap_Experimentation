@@ -112,6 +112,7 @@ void ofApp::draw(){
     
 	cam.begin();
     
+    //Builds the grid plane.
 	ofPushMatrix();
     ofRotate(90, 0, 0, 1);
     ofSetColor(20);
@@ -123,17 +124,19 @@ void ofApp::draw(){
     
     fingerType fingerTypes[] = {THUMB, INDEX, MIDDLE, RING, PINKY};
     
+    //Draws both the hands.
     for(int i = 0; i < simpleHands.size(); i++){
         bool isLeft        = simpleHands[i].isLeft;
         ofPoint handPos    = simpleHands[i].handPos;
         ofPoint handNormal = simpleHands[i].handNormal;
         
+        //Determines the color of the hands based on z position.
         ofSetColor(225);
-        ofDrawSphere(handPos.x, handPos.y, handPos.z, 50);
+        ofDrawSphere(handPos.x, handPos.y, handPos.z, 30);
         ofSetColor(0, 0, 0);
         ofDrawArrow(handPos, handPos + 100*handNormal);
         if(handPos.z <= -25) {
-            ofSetColor(0,0,0) ;
+            ofSetColor(100,100,100) ;
         }
         if(handPos.z <= -50) {
             ofSetColor(0,0,255) ;
@@ -145,26 +148,64 @@ void ofApp::draw(){
             ofSetColor(255,0,0) ;
         }
         
-        
+        //Checks the conditions of the hands.
         for (int f=0; f<5; f++) {
             ofPoint mcp = simpleHands[i].fingers[ fingerTypes[f] ].mcp;  // metacarpal
             ofPoint pip = simpleHands[i].fingers[ fingerTypes[f] ].pip;  // proximal
             ofPoint dip = simpleHands[i].fingers[ fingerTypes[f] ].dip;  // distal
             ofPoint tip = simpleHands[i].fingers[ fingerTypes[f] ].tip;  // fingertip
             
-            if(handPos.x >= 0) {
-                ofDrawBox  (mcp.x, mcp.y, mcp.z, ofMap(handPos.y, 0, ofGetWindowHeight(), 30, 80) );
-                ofDrawBox(pip.x, pip.y, pip.z, ofMap(handPos.y, 0, ofGetWindowHeight(), 30, 60) );
-                ofDrawBox(dip.x, dip.y, dip.z, ofMap(handPos.y, 0, ofGetWindowHeight(), 30, 50) );
-                ofDrawBox(tip.x, tip.y, tip.z, ofMap(handPos.y, 0, ofGetWindowHeight(), 30, 40) );
-            }
-            if(handPos.x <= -1) {
-                ofDrawSphere (mcp.x, mcp.y, mcp.z, ofMap(handPos.y, 0, ofGetWindowHeight(), 30, 80) );
-                ofDrawSphere(pip.x, pip.y, pip.z, ofMap(handPos.y, 0, ofGetWindowHeight(), 30, 60) );
-                ofDrawSphere(dip.x, dip.y, dip.z, ofMap(handPos.y, 0, ofGetWindowHeight(), 30, 50) );
-                ofDrawSphere(tip.x, tip.y, tip.z, ofMap(handPos.y, 0, ofGetWindowHeight(), 30, 40) );
+            //If statement that triggers the implosion
+            if(handPos.z <=-300) {
+                ofSetColor(ofRandom(50,255), ofRandom(0,255), ofRandom(100,155));
+                ofRotate(180);
             }
             
+            //Checks the hands positions and executes shape changes on the hands.
+            
+            //Right Hand
+            if(handPos.x >= 0) {
+                
+                //Gives the fingertips claws.
+                if(handPos.y>=ofGetHeight()/4) {
+                    ofDrawBox(mcp.x, mcp.y, mcp.z, ofMap(handPos.y, 0, ofGetWindowHeight(), 30, 80) );
+                    ofDrawBox(pip.x, pip.y, pip.z, ofMap(handPos.y, 0, ofGetWindowHeight(), 30, 60) );
+                    ofDrawBox(dip.x, dip.y, dip.z, ofMap(handPos.y, 0, ofGetWindowHeight(), 30, 50) );
+                    ofDrawCone(tip.x, tip.y-30, tip.z, 10, 60);
+
+                }
+                
+                //Draws the normal hand with boxes on all of the joints.
+                else {
+                    ofDrawBox(mcp.x, mcp.y, mcp.z, ofMap(handPos.y, 0, ofGetWindowHeight(), 30, 80) );
+                    ofDrawBox(pip.x, pip.y, pip.z, ofMap(handPos.y, 0, ofGetWindowHeight(), 30, 60) );
+                    ofDrawBox(dip.x, dip.y, dip.z, ofMap(handPos.y, 0, ofGetWindowHeight(), 30, 50) );
+                    ofDrawBox(tip.x, tip.y, tip.z, ofMap(handPos.y, 0, ofGetWindowHeight(), 30, 40) );
+                }
+            }
+            
+            //Left Hand
+            if(handPos.x <= -1) {
+                
+                //Gives the fingertips claws.
+                if(handPos.y>=ofGetHeight()/4) {
+                    ofDrawSphere(mcp.x, mcp.y, mcp.z, ofMap(handPos.y, 0, ofGetWindowHeight(), 30, 80) );
+                    ofDrawSphere(pip.x, pip.y, pip.z, ofMap(handPos.y, 0, ofGetWindowHeight(), 30, 60) );
+                    ofDrawSphere(dip.x, dip.y, dip.z, ofMap(handPos.y, 0, ofGetWindowHeight(), 30, 50) );
+                    ofDrawCone(tip.x, tip.y-30, tip.z, 10, 60);
+                }
+                
+                //Draws the normal hand with spheres on the joints.
+                else {
+                    
+                    ofDrawSphere(mcp.x, mcp.y, mcp.z, ofMap(handPos.y, 0, ofGetWindowHeight(), 30, 80) );
+                    ofDrawSphere(pip.x, pip.y, pip.z, ofMap(handPos.y, 0, ofGetWindowHeight(), 30, 60) );
+                    ofDrawSphere(dip.x, dip.y, dip.z, ofMap(handPos.y, 0, ofGetWindowHeight(), 30, 50) );
+                    ofDrawSphere(tip.x, tip.y, tip.z, ofMap(handPos.y, 0, ofGetWindowHeight(), 30, 40) );
+                }
+            }
+            
+            //The lines in between each joint making full fingers.
             ofSetLineWidth(5);
             ofLine(mcp.x, mcp.y, mcp.z, pip.x, pip.y, pip.z);
             ofLine(pip.x, pip.y, pip.z, dip.x, dip.y, dip.z);
